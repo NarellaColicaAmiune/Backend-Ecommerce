@@ -1,0 +1,15 @@
+h1 {
+    color: blue;
+}
+
+h2 {
+    color: rgb(0, 133, 33);
+}
+
+#products {
+    background-color: beige;
+}
+
+li {
+    padding: 10px;
+}

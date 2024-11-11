@@ -1,11 +1,11 @@
 {
   "name": "la-perla-ecommerce-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "start": "node .",
+    "dev": "node --watch ."
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,9 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.1",
+    "express-handlebars": "^8.0.1",
     "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.8.1",
     "uuid": "^10.0.0"
   }
 }

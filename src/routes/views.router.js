@@ -1,17 +1,21 @@
 import { Router } from "express";
-import ProductManager from "../managers/product.manager.js";
-import path from "path";
+import productDao from "../daos/product.dao.js";
 
 const router = Router();
-const prodManager = new ProductManager(path.join(process.cwd(), "src/data/products.json"));
 
 router.get("/home", async (req, res) => {
-    const products = await prodManager.getAll();
+    const products = await productDao.getAll();
     res.render("home", { products });
 });
 
 router.get("/realtimeproducts", (req, res) => {
     res.render("realTimeProducts");
+});
+
+router.get("/carts/:cid", async (req, res) => {
+    const { cid } = req.params;
+    const cart = await cartManager.getCartById(cid);
+    res.render("cart", { products: cart.products });
 });
 
 export default router;

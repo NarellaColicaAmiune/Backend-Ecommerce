@@ -5,7 +5,11 @@
     <input type="submit" value="Enviar">
 </form>
 
-<ul id="products"></ul>
+<ul id="products">
+    {{#each products}}
+        <li>{{this.name}} - ${{this.price}}</li>
+    {{/each}}
+</ul>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="index.js"></script>

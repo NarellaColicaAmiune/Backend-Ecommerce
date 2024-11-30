@@ -1,6 +1,16 @@
 <h2>Lista de Productos</h2>
-    <ul>
-        {{#each products}}
+<ul>
+    {{#each payload}}
         <li>{{this.name}} - ${{this.price}}</li>
-        {{/each}}
-    </ul>
+    {{/each}}
+</ul>
+
+<div>
+    {{#if hasPrevPage}}
+        <a href="{{prevLink}}">Anterior</a>
+    {{/if}}
+    Página {{page}} de {{totalPages}}
+    {{#if hasNextPage}}
+        <a href="{{nextLink}}">Siguiente</a>
+    {{/if}}
+</div>

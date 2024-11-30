@@ -1,3 +1,2 @@
 node_modules/
-src/managers/cart.manager.js
-src/routes/cart.router.js
+.env

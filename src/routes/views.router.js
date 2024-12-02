@@ -1,10 +1,10 @@
 import { Router } from "express";
-import productDao from "../daos/product.dao.js";
+import ProductService from "../daos/product.dao.js";
 
 const router = Router();
 
 router.get("/home", async (req, res) => {
-    const products = await productDao.getAll();
+    const products = await ProductService.getAll();
     res.render("home", { products });
 });
 

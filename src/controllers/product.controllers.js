@@ -1,9 +1,11 @@
-import * as services from "../services/product.services.js";
+import ProductService from "../services/product.services.js";
 
 export const getAll = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10, query = '', sort = '' } = req.query;
-        const response = await services.getAll(page, limit, query, sort);
+        let { page = 1, limit = 10, query = '', sort = '' } = req.query;
+        const cleanedPage = parseInt(page, 10) || 1;
+        const cleanedLimit = parseInt(limit, 10) || 10;
+        const response = await ProductService.getAll(query, { page: cleanedPage, limit: cleanedLimit, sort });
     
     res.json({
         status: response.docs.length > 0 ? "success" : "error",
@@ -25,7 +27,7 @@ export const getAll = async (req, res, next) => {
 export const getById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const item = await productDao.getById(id);
+        const item = await ProductService.getById(id);
         if (!item) throw new Error("Product not found");
         res.json(item);
     } catch (error) {
@@ -35,7 +37,7 @@ export const getById = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
     try {
-        const newProduct = await productDao.create(req.body);
+        const newProduct = await ProductService.create(req.body);
         if (!newProduct) throw new Error("Product not created");
         else res.json(newProduct);
     } catch (error) {
@@ -46,7 +48,7 @@ export const create = async (req, res, next) => {
 export const update = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const updatedProduct = await productDao.update(id, req.body);
+        const updatedProduct = await ProductService.update(id, req.body);
         if (!updatedProduct) throw new Error("Product not found");
         else res.json(updatedProduct);
     } catch (error) {
@@ -57,7 +59,7 @@ export const update = async (req, res, next) => {
 export const deleteProd = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const deletedProd = await productDao.deleteProd(id);
+        const deletedProd = await ProductService.delete(id);
         if (!deletedProd) throw new Error("Product not found");
         else res.json({ message: "Product deleted" });
     } catch (error) {

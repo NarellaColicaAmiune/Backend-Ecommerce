@@ -1,7 +1,36 @@
 <h2>Lista de Productos</h2>
+
+<form action="/products" method="GET">
+    <label for="category">Categoría:</label>
+    <select name="category" id="category">
+        <option value="">Todas</option>
+        <option value="Frutos secos">Frutos secos</option>
+        <option value="Mermeladas caseras">Mermeladas caseras</option>
+        <option value="Aromaticas">Aromaticas</option>
+        <option value="Condimentos">Condimentos</option>
+    </select>
+
+    <label for="sort">Ordenar por precio:</label>
+    <select name="sort" id="sort">
+        <option value="">Sin ordenar</option>
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+    </select>
+
+    <label for="limit">Limitar productos:</label>
+    <input type="number" name="limit" id="limit" placeholder="Número de productos" min="1">
+
+    <button type="submit">Aplicar Filtros</button>
+</form>
+
 <ul>
     {{#each payload}}
-        <li>{{this.name}} - ${{this.price}}</li>
+        <li>
+            <a href="/products/{{this._id}}">
+                {{this.name}} - ${{this.price}}
+            </a>
+            <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+        </li>
     {{/each}}
 </ul>
 
@@ -14,3 +43,16 @@
         <a href="{{nextLink}}">Siguiente</a>
     {{/if}}
 </div>
+
+<script>
+    function addToCart(productId) {
+        fetch(`/carts/${cartId}/products/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantity: 1 })
+        }).then(response => response.json())
+            .then(data => alert('Producto agregado al carrito!'));
+    }
+</script>

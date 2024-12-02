@@ -1,6 +1,6 @@
 import { ProductModel } from './models/product.model.js';
 
-class ProductDao {
+class ProductService {
   async getAll(query = {}, options = {}) {
     try {
       const { page = 1, limit = 10, sort, category, minPrice, maxPrice } = options;
@@ -12,10 +12,10 @@ class ProductDao {
       if (maxPrice) filters.price = { ...filters.price, $lte: maxPrice }; 
   
       const paginationOptions = {
-        page: parseInt(page, 10),
-        limit: parseInt(limit, 10),
+        page: parseInt(page, 10) || 1,
+        limit: parseInt(limit, 10) || 10,
         sort: sort ? { [sort]: 1 } : {},
-      };
+      };    
   
       const result = await ProductModel.paginate(filters, paginationOptions);
   
@@ -80,6 +80,6 @@ class ProductDao {
   }
 }
 
-const prodDao = new ProductDao(ProductModel);
+const prodDao = new ProductService(ProductModel);
 
 export default prodDao;

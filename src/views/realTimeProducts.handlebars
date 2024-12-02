@@ -1,7 +1,22 @@
 <h2>Agregar Nuevo Producto</h2>
 <form id="form">
-    <label>Producto:</label> <input type="text" id="productName" placeholder="Producto" required>
-    <label>Precio:</label> <input type="number" id="productPrice" placeholder="Precio" required>
+    <label for="name">Nombre:</label>
+    <input type="text" id="name" placeholder="Producto" required>
+
+    <label for="price">Precio:</label>
+    <input type="number" id="price" placeholder="Precio" required>
+
+    <label for="category">Categoría:</label>
+    <select id="category" required>
+        <option value="Frutos secos">Frutos secos</option>
+        <option value="Mermeladas caseras">Mermeladas caseras</option>
+        <option value="Aromaticas">Aromaticas</option>
+        <option value="Condimentos">Condimentos</option>
+    </select>
+
+    <label for="description">Descripción:</label>
+    <input type="text" id="description" placeholder="Descripción" required>
+
     <input type="submit" value="Enviar">
 </form>
 

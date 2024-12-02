@@ -1,6 +1,21 @@
 <h2>Carrito</h2>
 <ul>
     {{#each products}}
-        <li>{{this.product.name}} - ${{this.product.price}} - Cantidad: {{this.quantity}}</li>
+        <li>
+            {{this.product.name}} - ${{this.product.price}} - Cantidad: {{this.quantity}}
+            <form action="/carts/{{cartId}}/products/{{this.product._id}}" method="POST">
+                <input type="number" name="quantity" value="{{this.quantity}}" min="1" required>
+                <button type="submit">Actualizar cantidad</button>
+            </form>
+            <form action="/carts/{{cartId}}/products/{{this.product._id}}" method="DELETE">
+                <button type="submit">Eliminar producto</button>
+            </form>
+        </li>
     {{/each}}
 </ul>
+
+<div>
+    <form action="/carts/{{cartId}}" method="DELETE">
+        <button type="submit">Vaciar carrito</button>
+    </form>
+</div>

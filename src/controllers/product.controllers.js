@@ -2,10 +2,8 @@ import ProductService from "../services/product.services.js";
 
 export const getAll = async (req, res, next) => {
     try {
-        let { page = 1, limit = 10, query = '', sort = '' } = req.query;
-        const cleanedPage = parseInt(page, 10) || 1;
-        const cleanedLimit = parseInt(limit, 10) || 10;
-        const response = await ProductService.getAll(query, { page: cleanedPage, limit: cleanedLimit, sort });
+        const { page = 1, limit = 10, query = '', sort = '' } = req.query;
+        const response = await ProductService.getAll({ page, limit, sort, query });
     
     res.json({
         status: response.docs.length > 0 ? "success" : "error",
@@ -16,8 +14,8 @@ export const getAll = async (req, res, next) => {
         page: response.page,
         hasPrevPage: response.hasPrevPage,
         hasNextPage: response.hasNextPage,
-        prevLink: response.hasPrevPage ? `http://localhost:8080/products?page=${response.prevPage}` : null,
-        nextLink: response.hasNextPage ? `http://localhost:8080/products?page=${response.nextPage}` : null
+        prevLink: response.hasPrevPage ? `http://localhost:8080/api/products?page=${response.prevPage}` : null,
+        nextLink: response.hasNextPage ? `http://localhost:8080/api/products?page=${response.nextPage}` : null
     });
     } catch (error) {
     next(error);

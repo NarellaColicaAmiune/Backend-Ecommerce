@@ -4,7 +4,7 @@ class ProductService {
 
     async getAll({ page = 1, limit = 10, query = '', sort = '' }) {
         try {
-            const filter = query ? { $or: [{ category: query }, { stock: { $gt: 0 } }] } : {};
+            const filter = query ? { category: query } : {};
             let sortOrder = {};
             if (sort === 'asc') sortOrder = { price: 1 };
             if (sort === 'desc') sortOrder = { price: -1 };

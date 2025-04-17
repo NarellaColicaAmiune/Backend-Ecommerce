@@ -1,21 +1,73 @@
 <h2>Carrito</h2>
-<ul>
-    {{#each products}}
-        <li>
-            {{this.product.name}} - ${{this.product.price}} - Cantidad: {{this.quantity}}
-            <form action="/carts/{{cartId}}/products/{{this.product._id}}" method="POST">
-                <input type="number" name="quantity" value="{{this.quantity}}" min="1" required>
-                <button type="submit">Actualizar cantidad</button>
-            </form>
-            <form action="/carts/{{cartId}}/products/{{this.product._id}}" method="DELETE">
-                <button type="submit">Eliminar producto</button>
-            </form>
-        </li>
-    {{/each}}
-</ul>
-
 <div>
-    <form action="/carts/{{cartId}}" method="DELETE">
-        <button type="submit">Vaciar carrito</button>
-    </form>
+        <button id="vaciar-carrito">Vaciar carrito</button>
 </div>
+
+<div id="productos">
+    
+</div>
+
+<script>
+    const productosDOM = document.getElementById('productos')
+    const vaciarCarrito = document.getElementById('vaciar-carrito');
+    let products = [];
+
+    function renderizarCarrito(array) {
+        productosDOM.innerHTML = array.map(({product, quantity}) => `
+            <div>
+                <h3>${product.name}</h3>
+                <p>Precio: $${product.price}</p>
+                <p>Cantidad: ${quantity}</p>
+                <button id="eliminar-${product._id}">Eliminar del carrito</button>
+                <hr>
+            </div>
+        `).join('');
+    }
+
+    function attachDeleteEventListeners() {
+        const deleteBtns = document.querySelectorAll('button[id^="eliminar-"]');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const productId = btn.id.split('-')[1];
+                const response = await fetch(`/api/carts/products/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${window.localStorage.getItem("token")}`
+                    }
+                });
+                if (response.status === 200) {
+                    const newProducts = products.filter(p => p.product._id !== productId);
+                    products = newProducts;
+                    renderizarCarrito(newProducts);
+                    attachDeleteEventListeners();
+                }
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch('/api/carts', {
+            headers: {
+                Authorization: `Bearer ${window.localStorage.getItem("token")}`
+            }
+        });
+        const data = await response.json();
+        products = data.products;
+
+        renderizarCarrito(products);
+        attachDeleteEventListeners();
+    });
+
+    vaciarCarrito.addEventListener('click', async () => {
+        const response = await fetch('/api/carts', {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${window.localStorage.getItem("token")}`
+            }
+        });
+        if (response.status === 200) {
+            products = [];
+            renderizarCarrito(products);
+        }
+    });
+</script>

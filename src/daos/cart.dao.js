@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
-import cartModel from './cart.model.js'; 
-import productModel from './product.model.js'; 
 import { CustomError } from '../utils/error.custom.js';
+import cartModel from "./models/cart.model.js"
 
 class CartDaoMongoDB {
     constructor() {

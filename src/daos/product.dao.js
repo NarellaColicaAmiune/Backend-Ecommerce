@@ -18,7 +18,6 @@ class ProductService {
       };    
   
       const result = await ProductModel.paginate(filters, paginationOptions);
-  
       return result
     } catch (error) {
       console.error('Error al obtener productos con filtros/paginación:', error);

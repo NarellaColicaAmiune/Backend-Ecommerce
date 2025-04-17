@@ -1,0 +1,38 @@
+<h1>Registrar usuario</h1>
+
+<form id="registerForm">
+    <input type="email" name="email" placeholder="Email">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Registrar</button>
+</form>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        try {
+
+        e.preventDefault();
+        
+        // Aca va la logica para registrar usuario
+        const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: e.target.email.value,
+                password: e.target.password.value
+            })
+        });
+
+        if (response.status === 201) {
+            alert("Usuario registrado correctamente");
+        } else {
+            alert("Hubo un error al registrar el usuario");
+        }
+        } catch (error) {
+            console.error(error);
+            alert("Hubo un error al registrar el usuario");
+        }
+    });
+</script>
+

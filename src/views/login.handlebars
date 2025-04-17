@@ -1,0 +1,42 @@
+<h1>Iniciar sesión</h1>
+
+<form id="loginForm">
+    <input type="email" name="email" placeholder="Email">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Iniciar sesión</button>
+</form>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        try {
+
+        e.preventDefault();
+        // Aca va la logica para iniciar sesión
+        const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: e.target.email.value,
+                password: e.target.password.value
+            })
+        });
+
+        if (response.status === 200) {
+            const token = await response.json();
+            localStorage.setItem("token", token);
+            alert("Sesión iniciada correctamente");
+        } else {
+            alert("Hubo un error al iniciar sesión");
+        }
+
+        } catch (error) {
+            console.error(error);
+            alert("Hubo un error al iniciar sesión");
+        }
+
+    });
+</script>
+
+

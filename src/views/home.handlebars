@@ -1,6 +1,6 @@
 <h2>Lista de Productos</h2>
 
-<form action="/products" method="GET">
+<form id="filterForm">
     <label for="category">Categoría:</label>
     <select name="category" id="category">
         <option value="">Todas</option>
@@ -23,8 +23,8 @@
     <button type="submit">Aplicar Filtros</button>
 </form>
 
-<ul>
-    {{#each payload}}
+<ul id="productsList">
+    {{#each products.products}}
         <li>
             <a href="/products/{{this._id}}">
                 {{this.name}} - ${{this.price}}
@@ -35,24 +35,70 @@
 </ul>
 
 <div>
-    {{#if hasPrevPage}}
-        <a href="{{prevLink}}">Anterior</a>
+    {{#if products.hasPrevPage}}
+        <a href="{{products.prevPage}}">Anterior</a>
     {{/if}}
-    Página {{page}} de {{totalPages}}
-    {{#if hasNextPage}}
-        <a href="{{nextLink}}">Siguiente</a>
+    Página {{products.page}} de {{products.totalPages}}
+    {{#if products.hasNextPage}}
+        <a href="{{products.nextPage}}">Siguiente</a>
     {{/if}}
 </div>
 
 <script>
+    /*
     function addToCart(productId) {
-        fetch(`/carts/${cartId}/products/${productId}`, {
+        const cartId = window.localStorage.getItem("cartId");
+        fetch(`/api/carts/${cartId}/products/${productId}`, {
             method: 'POST',
             headers: {
+                "Authorization": `Bearer ${window.localStorage.getItem("token")}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ quantity: 1 })
         }).then(response => response.json())
             .then(data => alert('Producto agregado al carrito!'));
     }
+
+    */
+
+    async function addToCart(productId) {
+        try {
+
+        const response = await fetch(`/api/carts/products/${productId}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${window.localStorage.getItem("token")}`,
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (response.ok) {
+            alert('Producto agregado al carrito!');
+        }
+        } catch (error) {
+            console.error(error);
+            alert('No se pudo agregar el producto al carrito');
+        }
+    }
+
+    const filterForm = document.getElementById("filterForm");
+
+    // Filtrado de productos
+    filterForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const category = document.getElementById("category").value;
+        const query = category ? `query=${category}` : undefined;
+        const sort = document.getElementById("sort").value;
+        const limit = document.getElementById("limit").value;
+        const res = await fetch(`/api/products?${query}&sort=${sort}&limit=${limit}`);
+        const {status, payload} = await res.json();
+        if (status === "success") {
+            const productsList = document.getElementById("productsList");
+            productsList.innerHTML = "";
+            payload.forEach(product => {
+                const li = document.createElement("li");
+                li.textContent = `${product.name} - $${product.price}`;
+                productsList.appendChild(li);
+            });
+        }
+    });
 </script>

@@ -108,52 +108,62 @@ export const deleteAllProductsFromCart = async (cartId) => {
   }
 }
 
-// const cartSchema = new mongoose.Schema({
-//   products: [
-//     {
-//       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-//       quantity: {
-//         type: Number,
-//         default: 1,
-//         min: [1, "La cantidad mínima es 1"],
-//       },
-//     },
-//   ],
-// })
-
 export const purchaseCart = async (cartId, purchaser) => {
   try {
-    const cart = await CartModel.findById(cartId)
+    // Buscar el carrito por ID
+    const cart = await CartModel.findById(cartId).populate("products.product")
+    // Verificar si el carrito existe
     if (!cart) throw new CustomError("Cart not found", 404)
-      const productsToPurchase = []
-      const productsWithoutStock = []
-      console.log(cart.products)
-    cart.products.forEach(async (p) => {
-      const product = await ProductModel.findById(p.product)
-      if (!product) throw new CustomError("Product not found", 404)
-      if (product.stock < p.quantity) {
-        productsWithoutStock.push(product)
-        return
+    // Verificar si hay stock suficiente para cada producto
+    const outOfStockProducts = []
+    const productsToPurchase = []
+    for (const item of cart.products) {
+      const product = item.product
+      // Si hay stock suficiente, reducir el stock del producto
+      if (product.stock >= item.quantity) {
+        productsToPurchase.push(item)
+      } else {
+        // Si no hay stock suficiente, retornar los productos sin stock
+        outOfStockProducts.push({
+          product: product.name,
+          requested: item.quantity,
+          available: product.stock,
+        })
       }
-      product.stock -= p.quantity
+    }
+    // Crear un ticket de compra
+    const ticket = {
+      code: crypto.randomUUID(),
+      purchase_datetime: new Date(),
+      amount: productsToPurchase.reduce(
+        (total, item) => total + item.product.price * item.quantity,
+        0
+      ),
+      purchaser,
+    }
+// Guardar el ticket en la base de datos
+    const newTicket =
+      ticket.amount > 0 ? await TicketModel.create(ticket) : null
+    // Actualizar el stock de los productos comprados
+    for (const item of productsToPurchase) {
+      const product = item.product
+      product.stock -= item.quantity
       await product.save()
-      console.log(product)
-      productsToPurchase.push(product)
-    })
-    console.log({ productsToPurchase })
-    const totalPrice = productsToPurchase.reduce(
-      (acc, p) => acc + p.price * p.quantity,
-      0
+    }
+// Eliminar los productos comprados del carrito
+    cart.products = cart.products.filter(
+      (item) =>
+        !productsToPurchase.some((p) => p.product._id == item.product._id)
     )
-    const ticket =await TicketModel.create({ code: crypto.randomBytes(10).toString("hex"), purchase_datetime: new Date(), amount: totalPrice, purchaser })
-    cart.products.filter((p) => { 
-      if (!productsWithoutStock.includes(p.product)) {
-        return p
-      }
-    })
     await cart.save()
-    return { productsToPurchase, productsWithoutStock, ticket }
-  } catch (error) {
+
+    // Retornar el ticket y los productos comprados
+    return {
+      ticket: newTicket,
+      productsToPurchase,
+      outOfStockProducts,
+    }
+} catch (error) {
     console.log(error)
     throw new CustomError("Error purchasing cart", 500)
   }

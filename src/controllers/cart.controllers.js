@@ -68,8 +68,9 @@ export const deleteAllProductsFromCart = async (req, res, next) => {
 export const purchaseCart = async (req, res, next) => {
   try {
     const cid = req.user.cart
-    const { productsToPurchase, productsWithoutStock, ticket } = await cartService.purchaseCart(cid, req.user.email)
-    res.json({ productsWithoutStock, ticket })
+    const { productsToPurchase, outOfStockProducts, ticket } =
+      await cartService.purchaseCart(cid, req.user.email)
+    res.json({ outOfStockProducts, ticket })
   } catch (error) {
     console.log(error)
     next(error)

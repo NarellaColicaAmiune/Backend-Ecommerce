@@ -1,6 +1,8 @@
 import CartModel from "../daos/models/cart.model.js"
 import { ProductModel } from "../daos/models/product.model.js"
 import { CustomError } from "../utils/error.custom.js"
+import TicketModel from "../daos/models/ticket.model.js"
+import crypto from "crypto"
 
 export const getCartById = async (cartId) => {
   try {
@@ -103,5 +105,56 @@ export const deleteAllProductsFromCart = async (cartId) => {
     return cart
   } catch (error) {
     throw new CustomError("Error deleting all products from cart", 500)
+  }
+}
+
+// const cartSchema = new mongoose.Schema({
+//   products: [
+//     {
+//       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+//       quantity: {
+//         type: Number,
+//         default: 1,
+//         min: [1, "La cantidad mínima es 1"],
+//       },
+//     },
+//   ],
+// })
+
+export const purchaseCart = async (cartId, purchaser) => {
+  try {
+    const cart = await CartModel.findById(cartId)
+    if (!cart) throw new CustomError("Cart not found", 404)
+      const productsToPurchase = []
+      const productsWithoutStock = []
+      console.log(cart.products)
+    cart.products.forEach(async (p) => {
+      const product = await ProductModel.findById(p.product)
+      if (!product) throw new CustomError("Product not found", 404)
+      if (product.stock < p.quantity) {
+        productsWithoutStock.push(product)
+        return
+      }
+      product.stock -= p.quantity
+      await product.save()
+      console.log(product)
+      productsToPurchase.push(product)
+    })
+    console.log({ productsToPurchase })
+    const totalPrice = productsToPurchase.reduce(
+      (acc, p) => acc + p.price * p.quantity,
+      0
+    )
+    const ticket =await TicketModel.create({ code: crypto.randomBytes(10).toString("hex"), purchase_datetime: new Date(), amount: totalPrice, purchaser })
+    cart.products.filter((p) => { 
+      if (!productsWithoutStock.includes(p.product)) {
+        return p
+      }
+    })
+    await cart.save()
+    return { productsToPurchase, productsWithoutStock, ticket }
+  } catch (error) {
+    console.log(error)
+    throw new CustomError("Error purchasing cart", 500)
   }
 }

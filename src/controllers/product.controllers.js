@@ -37,7 +37,7 @@ export const create = async (req, res, next) => {
     try {
         const newProduct = await ProductService.create(req.body);
         if (!newProduct) throw new Error("Product not created");
-        else res.json(newProduct);
+        else res.status(201).json(newProduct);
     } catch (error) {
         next(error);
     }

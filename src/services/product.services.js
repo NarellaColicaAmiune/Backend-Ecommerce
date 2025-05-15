@@ -1,4 +1,5 @@
 import { ProductModel } from "../daos/models/product.model.js";
+import createProductSchema from "../schemas/products.validator.js";
 
 class ProductService {
 
@@ -33,6 +34,10 @@ class ProductService {
 
     async create(productData) {
         try {
+            const result = await createProductSchema.safeParse(productData);
+            if (!result.success) {
+                throw new Error(result.error.message);
+            }
             const newProduct = new ProductModel(productData);
             return await newProduct.save();
         } catch (error) {

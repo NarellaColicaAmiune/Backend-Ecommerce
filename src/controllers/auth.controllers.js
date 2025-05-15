@@ -19,3 +19,8 @@ export const loginController = async (req, res, next) => {
     next(error)
   }
 }
+
+export const getUserController = async (req, res) => {
+  const user = await getUserById(req.user._id)
+  res.json(user)
+};
